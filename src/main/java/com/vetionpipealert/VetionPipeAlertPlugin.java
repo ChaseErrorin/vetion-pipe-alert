@@ -23,7 +23,7 @@ import net.runelite.client.plugins.PluginDescriptor;
 
 @Slf4j
 @PluginDescriptor(
-	name = "Vet'ion Pipe Alert"
+	name = "Vetion Pipe Alert"
 )
 public class VetionPipeAlertPlugin extends Plugin
 {
