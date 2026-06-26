@@ -8,6 +8,7 @@ import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.UnsupportedAudioFileException;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
+import net.runelite.api.FriendsChatManager;
 import net.runelite.api.NPC;
 import net.runelite.api.Player;
 import net.runelite.api.clan.ClanChannel;
@@ -114,7 +115,12 @@ public class VetionPipeAlertPlugin extends Plugin
 			return;
 		}
 
-		if (config.ignoreFriendsAndClanmates() && isFriendOrClanmate(player))
+		if (config.ignoreFriends() && isFriend(player))
+		{
+			return;
+		}
+
+		if (config.ignoreClanMembers() && isClanMember(player))
 		{
 			return;
 		}
@@ -122,7 +128,13 @@ public class VetionPipeAlertPlugin extends Plugin
 		playPipeSound();
 	}
 
-	private boolean isFriendOrClanmate(Player player)
+	private boolean isFriend(Player player)
+	{
+		String name = player.getName();
+		return name != null && client.isFriended(name, false);
+	}
+
+	private boolean isClanMember(Player player)
 	{
 		String name = player.getName();
 		if (name == null)
@@ -130,12 +142,8 @@ public class VetionPipeAlertPlugin extends Plugin
 			return false;
 		}
 
-		if (client.isFriended(name, false))
-		{
-			return true;
-		}
-
-		if (client.getFriendsChatManager() != null && client.getFriendsChatManager().findByName(name) != null)
+		FriendsChatManager friendsChatManager = client.getFriendsChatManager();
+		if (friendsChatManager != null && friendsChatManager.findByName(name) != null)
 		{
 			return true;
 		}
