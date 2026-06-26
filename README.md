@@ -2,7 +2,7 @@
 Plays a pipe banging sound when a PKer enters your Vet'ion or Calvar'ion lair.
 
 ## Context
-In the 2026 Deadman Mode AllStars the Purpp Rebels were slaying Calvar'ion while team member Skillspecs kept watch, due to the long hours of the tournament the team was becoming tired.
+In the 2026 Deadman Mode AllStars the Purpp Rebels were slaying Vet'ion while team member Skillspecs kept watch, due to the long hours of the tournament the team was becoming tired.
 Skillspecs worked to wake the team by playing a rallying 'extremely loud pipe banging sound' but in that moment, the opposing Dino Nuggets team dropped in creating a perfectly timed moment.
 
 <div align="center">
