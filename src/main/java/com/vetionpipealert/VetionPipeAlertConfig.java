@@ -30,12 +30,23 @@ public interface VetionPipeAlertConfig extends Config
 		return true;
 	}
 
+	@ConfigItem(
+		keyName = "cooldown",
+		name = "Only 1 alert per team",
+		description = "When enabled, only play one sound every few seconds so a team dropping in together triggers a single bang instead of many overlapping ones",
+		position = 3
+	)
+	default boolean cooldown()
+	{
+		return false;
+	}
+
 	@Range(min = 0, max = 200)
 	@ConfigItem(
 		keyName = "volume",
 		name = "Volume",
 		description = "Volume of the pipe banging sound, as a percentage of the source clip's volume",
-		position = 3
+		position = 4
 	)
 	default int volume()
 	{

@@ -30,6 +30,7 @@ public class VetionPipeAlertPlugin extends Plugin
 {
 	private static final Set<String> LAIR_BOSS_NAMES = new HashSet<>();
 	private static final String PIPE_SOUND_RESOURCE = "pipebang.wav";
+	private static final int COOLDOWN_TICKS = 8;
 
 	static
 	{
@@ -50,12 +51,14 @@ public class VetionPipeAlertPlugin extends Plugin
 
 	private int lairBossCount = 0;
 	private boolean settled = false;
+	private int lastPipeTick = -COOLDOWN_TICKS;
 
 	@Override
 	protected void startUp() throws Exception
 	{
 		lairBossCount = 0;
 		settled = false;
+		lastPipeTick = -COOLDOWN_TICKS;
 	}
 
 	@Override
@@ -63,6 +66,7 @@ public class VetionPipeAlertPlugin extends Plugin
 	{
 		lairBossCount = 0;
 		settled = false;
+		lastPipeTick = -COOLDOWN_TICKS;
 	}
 
 	@Subscribe
@@ -125,6 +129,12 @@ public class VetionPipeAlertPlugin extends Plugin
 			return;
 		}
 
+		if (config.cooldown() && client.getTickCount() - lastPipeTick < COOLDOWN_TICKS)
+		{
+			return;
+		}
+
+		lastPipeTick = client.getTickCount();
 		playPipeSound();
 	}
 
