@@ -45,7 +45,7 @@ public interface VetionPipeAlertConfig extends Config
 	@ConfigItem(
 		keyName = "volume",
 		name = "Volume",
-		description = "Volume of the pipe banging sound, as a percentage of the source clip's volume",
+		description = "Volume of the pipe banging sound, can be boosted up to 200",
 		position = 4
 	)
 	default int volume()
