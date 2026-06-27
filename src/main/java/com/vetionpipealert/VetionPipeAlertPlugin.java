@@ -9,12 +9,10 @@ import javax.sound.sampled.UnsupportedAudioFileException;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
 import net.runelite.api.FriendsChatManager;
-import net.runelite.api.NPC;
 import net.runelite.api.Player;
 import net.runelite.api.clan.ClanChannel;
+import net.runelite.api.coords.WorldPoint;
 import net.runelite.api.events.GameTick;
-import net.runelite.api.events.NpcDespawned;
-import net.runelite.api.events.NpcSpawned;
 import net.runelite.api.events.PlayerSpawned;
 import net.runelite.client.audio.AudioPlayer;
 import net.runelite.client.config.ConfigManager;
@@ -28,16 +26,14 @@ import net.runelite.client.plugins.PluginDescriptor;
 )
 public class VetionPipeAlertPlugin extends Plugin
 {
-	private static final Set<String> LAIR_BOSS_NAMES = new HashSet<>();
+	private static final Set<Integer> LAIR_REGIONS = new HashSet<>();
 	private static final String PIPE_SOUND_RESOURCE = "pipebang.wav";
 	private static final int COOLDOWN_TICKS = 8;
 
 	static
 	{
-		LAIR_BOSS_NAMES.add("Vet'ion");
-		LAIR_BOSS_NAMES.add("Vet'ion Reborn");
-		LAIR_BOSS_NAMES.add("Calvar'ion");
-		LAIR_BOSS_NAMES.add("Calvar'ion Reborn");
+		LAIR_REGIONS.add(7604);   // Calvar'ion's lair (Skeletal Tomb)
+		LAIR_REGIONS.add(13215);  // Vet'ion's Rest
 	}
 
 	@Inject
@@ -49,14 +45,14 @@ public class VetionPipeAlertPlugin extends Plugin
 	@Inject
 	private AudioPlayer audioPlayer;
 
-	private int lairBossCount = 0;
+	private boolean inLair = false;
 	private boolean settled = false;
 	private int lastPipeTick = -COOLDOWN_TICKS;
 
 	@Override
 	protected void startUp() throws Exception
 	{
-		lairBossCount = 0;
+		inLair = false;
 		settled = false;
 		lastPipeTick = -COOLDOWN_TICKS;
 	}
@@ -64,42 +60,38 @@ public class VetionPipeAlertPlugin extends Plugin
 	@Override
 	protected void shutDown() throws Exception
 	{
-		lairBossCount = 0;
+		inLair = false;
 		settled = false;
 		lastPipeTick = -COOLDOWN_TICKS;
 	}
 
 	@Subscribe
-	public void onNpcSpawned(NpcSpawned npcSpawned)
-	{
-		NPC npc = npcSpawned.getNpc();
-		if (LAIR_BOSS_NAMES.contains(npc.getName()))
-		{
-			lairBossCount++;
-		}
-	}
-
-	@Subscribe
-	public void onNpcDespawned(NpcDespawned npcDespawned)
-	{
-		NPC npc = npcDespawned.getNpc();
-		if (LAIR_BOSS_NAMES.contains(npc.getName()))
-		{
-			lairBossCount = Math.max(0, lairBossCount - 1);
-			if (lairBossCount == 0)
-			{
-				settled = false;
-			}
-		}
-	}
-
-	@Subscribe
 	public void onGameTick(GameTick gameTick)
 	{
-		// Wait one tick after entering the lair before treating spawns as drop-ins, so the
-		// burst of PlayerSpawned events for players already in the room when we arrive
-		// doesn't get mistaken for them dropping in.
-		if (lairBossCount > 0 && !settled)
+		Player local = client.getLocalPlayer();
+		boolean nowInLair = false;
+		if (local != null)
+		{
+			WorldPoint location = local.getWorldLocation();
+			nowInLair = location != null && LAIR_REGIONS.contains(location.getRegionID());
+		}
+
+		if (!nowInLair)
+		{
+			inLair = false;
+			settled = false;
+			return;
+		}
+
+		if (!inLair)
+		{
+			// Just entered the lair this tick. Wait until next tick before treating player
+			// spawns as drop-ins, so the players already in the room when we arrive don't
+			// trigger the alert.
+			inLair = true;
+			settled = false;
+		}
+		else
 		{
 			settled = true;
 		}
@@ -108,7 +100,7 @@ public class VetionPipeAlertPlugin extends Plugin
 	@Subscribe
 	public void onPlayerSpawned(PlayerSpawned playerSpawned)
 	{
-		if (lairBossCount == 0 || !settled)
+		if (!inLair || !settled)
 		{
 			return;
 		}
