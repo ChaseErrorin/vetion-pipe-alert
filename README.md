@@ -33,5 +33,4 @@ Skillspecs worked to wake the team by playing a rallying 'extremely loud pipe ba
 ## Features
 
 Options to ignore friends or clanmates entering the lair (on by default)  
-Volume slider  
-Option to play sound when you drop in on unsuspecting PVMers (off by default)
+Volume slider
