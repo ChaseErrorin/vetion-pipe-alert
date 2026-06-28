@@ -4,8 +4,6 @@ import com.google.inject.Provides;
 import java.util.HashSet;
 import java.util.Set;
 import javax.inject.Inject;
-import javax.sound.sampled.LineUnavailableException;
-import javax.sound.sampled.UnsupportedAudioFileException;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
 import net.runelite.api.FriendsChatManager;
@@ -168,7 +166,7 @@ public class VetionPipeAlertPlugin extends Plugin
 		{
 			audioPlayer.play(VetionPipeAlertPlugin.class, PIPE_SOUND_RESOURCE, gainDb);
 		}
-		catch (UnsupportedAudioFileException | LineUnavailableException | java.io.IOException e)
+		catch (Exception e)
 		{
 			log.warn("Unable to play pipe banging sound", e);
 		}
